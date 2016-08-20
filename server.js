@@ -21,6 +21,8 @@ var userRoutes = require('./routes/user');
 var adminRoutes = require('./routes/admin');
 var apiRoutes = require('./api/api');
 
+var cartLength = require('./middlewares/middlewares');
+
 var app = express();
 
 mongoose.connect(secret.database, function(err){
@@ -48,6 +50,13 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(function(req, res, next){
+    res.locals.user = req.user;
+    next();
+});
+
+app.use(cartLength);
+
 
 app.use(function(req, res, next){
     Category.find({}, function(err, categories){
@@ -57,10 +66,7 @@ app.use(function(req, res, next){
     });
 });
 
-app.use(function(req, res, next){
-    res.locals.user = req.user;
-    next();
-});
+
 
 
 app.engine('ejs', ejsMate);
